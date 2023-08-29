@@ -21,7 +21,7 @@ app.enable('trust proxy');
 
 app.use(
     cors({
-      origin: [procces.env.REACT_APP_URI]
+      origin: [process.env.REACT_APP_URI]
     })
   );
 
