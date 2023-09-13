@@ -23,15 +23,10 @@ app.use(
     })
   );
 
-// const authRouter = require('./routes/auth');
-
-
-
 app.get("/", (req:Request, res:Response,) => {
     res.send("Hello world!!");
   })
 
-  
   app.use('/users', usersRouter);
 //   app.use('/auth', authRouter);
   
