@@ -1,3 +1,5 @@
+import { NextFunction, Request, Response } from "express";
+import usersRouter from './routes/users';
 require('dotenv').config()
 const express = require('express');
 const app = express();
@@ -21,22 +23,28 @@ app.use(
     })
   );
 
-  // const usersRouter = require('./routes/users');
 // const authRouter = require('./routes/auth');
-// const itemsRouter = require('./routes/items');
-// const cartRouter = require('./routes/cart')
-// const stripeRouter = require('./routes/stripe')
 
 
-app.get("/", (req: any, res: { send: (arg0: string) => void; } ) => {
+
+app.get("/", (req:Request, res:Response,) => {
     res.send("Hello world!!");
   })
 
-// app.use('/users', usersRouter);
-// app.use('/auth', authRouter);
-// app.use('/items', itemsRouter);
-// app.use('/cart', cartRouter)
-// app.use('/stripe', stripeRouter)
-
+  
+  app.use('/users', usersRouter);
+//   app.use('/auth', authRouter);
+  
+  app.use((req:Request, res:Response, next:NextFunction) => {
+      next(Error("Endpoint not found"));
+  });
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((error: unknown, req:Request, res:Response, next:NextFunction) => {
+      console.error(error);
+      let errorMessage = "An unknown error occured";
+      if (error instanceof Error) errorMessage = error.message;
+      res.status(500).json({error:errorMessage});
+  });
 
 export default app

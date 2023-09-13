@@ -17,17 +17,22 @@ app.enable('trust proxy');
 app.use(cors({
     origin: [process.env.CLIENT_URI]
 }));
-// const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/users');
 // const authRouter = require('./routes/auth');
-// const itemsRouter = require('./routes/items');
-// const cartRouter = require('./routes/cart')
-// const stripeRouter = require('./routes/stripe')
 app.get("/", (req, res) => {
-    res.send("Hello world!");
+    res.send("Hello world!!");
 });
-// app.use('/users', usersRouter);
-// app.use('/auth', authRouter);
-// app.use('/items', itemsRouter);
-// app.use('/cart', cartRouter)
-// app.use('/stripe', stripeRouter)
+app.use('/users', usersRouter);
+//   app.use('/auth', authRouter);
+app.use((req, res, next) => {
+    next(Error("Endpoint not found"));
+});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((error, req, res, next) => {
+    console.error(error);
+    let errorMessage = "An unknown error occured";
+    if (error instanceof Error)
+        errorMessage = error.message;
+    res.status(500).json({ error: errorMessage });
+});
 exports.default = app;
