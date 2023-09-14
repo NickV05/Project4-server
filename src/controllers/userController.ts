@@ -16,20 +16,40 @@ export const getUser:RequestHandler = async (req, res, next) => {
 export const createUser:RequestHandler = (req, res, next) => {
     const saltRounds = 10;
     const { email, password, fullName, location, username  } = req.body;
-    if (email === "" || password === "") {
-        res.status(400).json({ message: "Provide email, password and name" });
+    if (email === "") {
+        res.status(400).json({ message: "Please provide email." });
+        return;
+      }
+
+      if (password === "") {
+        res.status(400).json({ message: "Please provide password." });
         return;
       }
     
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
       if (!emailRegex.test(email)) {
-        res.status(400).json({ message: "Provide a valid email address." });
+        res.status(400).json({ message: "Please provide a valid email address." });
         return;
       }
     
       const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
       if (!passwordRegex.test(password)) {
         res.status(400).json({ message: 'Password must have at least 6 characters and contain at least one number, one lowercase and one uppercase letter.' });
+        return;
+      }
+
+      if (fullName === "") {
+        res.status(400).json({ message: 'Please provide your full name.' });
+        return;
+      }
+
+      if (location === "") {
+        res.status(400).json({ message: 'Please provide your location.' });
+        return;
+      }
+
+      if (username === "") {
+        res.status(400).json({ message: 'Please provide your username.' });
         return;
       }
     

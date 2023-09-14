@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import usersRouter from './routes/users';
+import createHttpError, { isHttpError} from "http-errors";
 require('dotenv').config()
 const express = require('express');
 const app = express();
@@ -31,15 +32,20 @@ app.get("/", (req:Request, res:Response,) => {
 //   app.use('/auth', authRouter);
   
   app.use((req:Request, res:Response, next:NextFunction) => {
-      next(Error("Endpoint not found"));
+      next(createHttpError(404,"Endpoint not found"));
   });
   
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((error: unknown, req:Request, res:Response, next:NextFunction) => {
       console.error(error);
       let errorMessage = "An unknown error occured";
+      let statusCode = 500;
+      if(isHttpError(error)){
+        statusCode = error.status;
+        errorMessage = error.message;
+      }
       if (error instanceof Error) errorMessage = error.message;
-      res.status(500).json({error:errorMessage});
+      res.status(statusCode).json({error:errorMessage});
   });
 
 export default app
