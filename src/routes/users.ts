@@ -1,8 +1,9 @@
 import * as usersController from "../controllers/userController";
 import  express  from "express";
+import isAuthenticated from "../middleware/isAuthenticated";
 const router = express.Router();
 
-router.get("/",usersController.getUser);
 router.post("/signup", usersController.createUser);
 router.post("/login", usersController.login);
+router.get("/verify",isAuthenticated, usersController.verify);
 export default router;

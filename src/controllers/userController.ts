@@ -1,17 +1,9 @@
 import { RequestHandler } from "express";
+import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const getUser:RequestHandler = async (req, res, next) => {
-    try{
-        const users = await User.find().exec();
-        res.status(200).json(users);
-    }
-    catch(error){
-     next(error);   
-    }
-}
 
 export const createUser:RequestHandler = (req, res, next) => {
     const saltRounds = 10;
@@ -127,4 +119,11 @@ export const login:RequestHandler = (req, res, next) => {
         console.log(err);
         next(err);
       });
+  };
+
+ export const verify = (req:Request, res:Response) => {
+
+    console.log("req.user", req.user);
+  
+    res.status(200).json(req.user);
   };
