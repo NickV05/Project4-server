@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import usersRouter from './routes/users';
+import pageRouter from './routes/pageData';
 import createHttpError, { isHttpError} from "http-errors";
 require('dotenv').config()
 const express = require('express');
@@ -29,7 +30,7 @@ app.get("/", (req:Request, res:Response,) => {
   })
 
   app.use('/users', usersRouter);
-//   app.use('/auth', authRouter);
+  app.use('/pageData', pageRouter);
   
   app.use((req:Request, res:Response, next:NextFunction) => {
       next(createHttpError(404,"Endpoint not found"));
