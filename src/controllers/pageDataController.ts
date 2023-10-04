@@ -1,12 +1,12 @@
 import { RequestHandler } from "express";
 import axios from "axios";
-import nodemailer, { SentMessageInfo } from "nodemailer";
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_ADDRESS,
-    pass: process.env.EMAIL_PASSWORD,
+    user: "nikita.valovyy@gmail.com",
+    pass: "aearbttnkredizgj"
   }
 });
 
@@ -26,15 +26,20 @@ export const ask: RequestHandler = (req, res) => {
   console.log("RECEIVED BODY ===>", req.body);
   const { name, email, message } = req.body;
 
-  transporter.sendMail({
-    from: `${name} <${email}>`,
-    to: 'nikita.valovyy@gmail.com', 
-    subject: 'Project4', 
-    text: `${message}`,
-    html: `<b>${message}</b>`
-  })
-  .then((info: SentMessageInfo) => console.log(info))
-  .catch((error: Error) => console.log(error));
+  const mailOptions = {
+    from: `${name}, ${email}`,
+    to: "nikita.valovyy@gmail.com",
+    subject: "Project4",
+    text: `From ${name}, ${email}. ${message}`
+ };
+ 
+ transporter.sendMail(mailOptions, function(error, info){
+    if(error){
+       console.log(error);
+    }else{
+       console.log("Email sent: " + info.response);
+    }
+ });
 
   res.status(200).json({ message: "Message received" });
 };
