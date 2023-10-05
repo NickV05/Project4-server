@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import axios from "axios";
 import nodemailer from "nodemailer";
+import Email from "../models/Email";
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -43,4 +44,19 @@ export const ask: RequestHandler = (req, res) => {
 
   res.status(200).json({ message: "Message received" });
 };
+
+export const subscribe: RequestHandler = (req, res, next) => {
+  console.log("REQ>BODY ====>", req.body)
+  const { email } = req.body;
+  Email.create({ email })
+    .then((createdEmail) => {
+      console.log("SUBSCRIBED EMAIL ===>", createdEmail);
+    })
+    .catch((error: Error) => {
+      console.log(error);
+      next(error);
+    });
+};
+
+
 
