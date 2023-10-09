@@ -1,5 +1,5 @@
 // @ts-nocheck
-const app = require("./app");
+const app = require("./app.ts");
 const mongoose = require('mongoose')
 const debug = require('debug')('server:server');
 const http = require('http');
