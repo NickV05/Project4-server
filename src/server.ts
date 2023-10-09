@@ -33,7 +33,7 @@ function normalizePort(val) {
   return false;
 }
 
-function onError(error: { syscall; code}) {
+function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -66,7 +66,7 @@ function onListening() {
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then((x: { connections: { name }[]; }) => {
+  .then((x) => {
     console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);
   })
   .catch((err) => {
