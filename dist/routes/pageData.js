@@ -26,11 +26,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const usersController = __importStar(require("../controllers/userController"));
+const pageDataController = __importStar(require("../controllers/pageDataController"));
 const express_1 = __importDefault(require("express"));
-const isAuthenticated_1 = __importDefault(require("../middleware/isAuthenticated"));
+// import isAuthenticated from "../middleware/isAuthenticated";
 const router = express_1.default.Router();
-router.post("/signup", usersController.createUser);
-router.post("/login", usersController.login);
-router.get("/verify", isAuthenticated_1.default, usersController.verify);
+router.get("/blogs", pageDataController.getBlogs);
+router.post("/ask", pageDataController.ask);
+router.post("/subscribe", pageDataController.subscribe);
 exports.default = router;

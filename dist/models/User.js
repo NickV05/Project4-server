@@ -11,9 +11,18 @@ const userSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    fullName: String,
-    location: String,
-    username: String,
+    fullName: {
+        type: String,
+        required: true
+    },
+    location: {
+        type: String,
+        required: true
+    },
+    username: {
+        type: String,
+        required: true
+    },
     image: {
         type: String,
         default: 'https://res.cloudinary.com/dyto7dlgt/image/upload/v1691526692/project3/avatar_h1b0st.jpg'
