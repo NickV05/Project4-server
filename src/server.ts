@@ -1,4 +1,4 @@
-import app from "./app"
+const app = require("./app");
 const mongoose = require('mongoose')
 const debug = require('debug')('server:server');
 const http = require('http');
