@@ -1,5 +1,4 @@
-// @ts-nocheck
-const app = require("./app.ts");
+const app = require("./app");
 const mongoose = require('mongoose')
 const debug = require('debug')('server:server');
 const http = require('http');
@@ -9,7 +8,7 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-server.listen(port, (error) => {
+server.listen(port, (error: NodeJS.ErrnoException | null) => {
   if (error) {
     console.error("Error in server setup:", error.message);
     process.exit(1);
@@ -19,7 +18,7 @@ server.listen(port, (error) => {
 server.on('error', onError);
 server.on('listening', onListening);
 
-function normalizePort(val) {
+function normalizePort(val: any) {
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -33,7 +32,7 @@ function normalizePort(val) {
   return false;
 }
 
-function onError(error) {
+function onError(error: NodeJS.ErrnoException) {
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -66,11 +65,10 @@ function onListening() {
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then((x) => {
+  .then((x: { connections: { name: any; }[]; }) => {
     console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.error("Error connecting to mongo: ", err);
   });
 
-module.exports = app;

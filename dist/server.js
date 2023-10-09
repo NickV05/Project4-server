@@ -1,18 +1,16 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
+const app = require("./app");
 const mongoose = require('mongoose');
 const debug = require('debug')('server:server');
 const http = require('http');
 const port = normalizePort(process.env.PORT);
-app_1.default.set('port', port);
-const server = http.createServer(app_1.default);
-server.listen(port, (err) => {
-    if (err)
-        console.log("Error in server setup");
+app.set('port', port);
+const server = http.createServer(app);
+server.listen(port, (error) => {
+    if (error) {
+        console.error("Error in server setup:", error.message);
+        process.exit(1);
+    }
     console.log("Server listening on Port", port);
 });
 server.on('error', onError);
@@ -62,4 +60,3 @@ mongoose
     .catch((err) => {
     console.error("Error connecting to mongo: ", err);
 });
-module.exports = app_1.default;

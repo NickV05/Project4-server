@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -23,10 +14,10 @@ const transporter = nodemailer_1.default.createTransport({
         pass: "aearbttnkredizgj"
     }
 });
-const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getBlogs = async (req, res, next) => {
     try {
         const umbrellaUrl = "https://expressapp.adaptable.app/forum/getblogs";
-        const response = yield axios_1.default.get(umbrellaUrl);
+        const response = await axios_1.default.get(umbrellaUrl);
         const data = response.data;
         console.log("Response ===>", data);
         res.json(data);
@@ -34,7 +25,7 @@ const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         next(error);
     }
-});
+};
 exports.getBlogs = getBlogs;
 const ask = (req, res) => {
     console.log("RECEIVED BODY ===>", req.body);
