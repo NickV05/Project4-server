@@ -1,8 +1,10 @@
 "use strict";
-import app from "./app";
+import app from './app.js';
 import mongoose from 'mongoose';
 import debug from 'debug';
 import http from 'http';
+import dotenv from 'dotenv';
+dotenv.config();
 const debugLogger = debug('server:server');
 const port = normalizePort(process.env.PORT);
 app.set('port', port);
