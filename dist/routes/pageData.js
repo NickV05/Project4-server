@@ -1,4 +1,4 @@
-import * as pageDataController from "../controllers/pageDataController";
+import * as pageDataController from "../controllers/pageDataController.js";
 import express from "express";
 // import isAuthenticated from "../middleware/isAuthenticated";
 const router = express.Router();
