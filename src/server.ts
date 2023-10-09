@@ -8,10 +8,7 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-server.listen(port, (err: any) => {
-  if (err) console.log("Error in server setup")
-  console.log("Server listening on Port", port);
-});
+server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
