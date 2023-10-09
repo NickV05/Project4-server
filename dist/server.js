@@ -1,8 +1,9 @@
 "use strict";
-const app = require("./app");
-const mongoose = require('mongoose');
-const debug = require('debug')('server:server');
-const http = require('http');
+import app from "./app";
+import mongoose from 'mongoose';
+import debug from 'debug';
+import http from 'http';
+const debugLogger = debug('server:server');
 const port = normalizePort(process.env.PORT);
 app.set('port', port);
 const server = http.createServer(app);
