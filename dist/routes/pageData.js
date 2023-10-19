@@ -6,4 +6,4 @@ const router = express.Router();
 router.get("/blogs", pageDataController.getBlogs);
 router.post("/ask", pageDataController.ask);
 router.post("/subscribe", pageDataController.subscribe);
-exports.default = router;
+export default router;
