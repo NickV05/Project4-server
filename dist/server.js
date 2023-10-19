@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pool = void 0;
 import mysql from "mysql2";
-import app from './app';
+import app from './app.js';
 import fs from 'fs';
 import debug from 'debug';
 import http from 'http';

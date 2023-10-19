@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.subscribe = exports.ask = exports.getBlogs = void 0;
 import axios from "axios";
 import nodemailer from "nodemailer";
-import { pool } from "../server";
+import { pool } from "../server.js";
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {

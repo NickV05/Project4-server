@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-import usersRouter from './routes/users';
-import pageRouter from './routes/pageData';
+import usersRouter from './routes/users.js';
+import pageRouter from './routes/pageData.js';
 import createHttpError, { isHttpError } from "http-errors";
 import dotenv from 'dotenv';
 dotenv.config();

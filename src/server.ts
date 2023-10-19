@@ -1,5 +1,5 @@
 const mysql = require("mysql2");
-const app = require('./app');
+const app = require('./app.ts');
 const fs = require('fs');
 const debug = require('debug')('server:server');
 const http = require('http');

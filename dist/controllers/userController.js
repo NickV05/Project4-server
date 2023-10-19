@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verify = exports.login = exports.createUser = void 0;
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { pool } from "../server";
+import { pool } from "../server.js";
 const createUser = (req, res, next) => {
     const saltRounds = 10;
     const { email, password, fullName, location, username } = req.body;
