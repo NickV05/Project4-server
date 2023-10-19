@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
         pass: "aearbttnkredizgj"
     }
 });
-const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+export const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const umbrellaUrl = "https://expressapp.adaptable.app/forum/getblogs";
         const response = yield axios.get(umbrellaUrl);
@@ -32,8 +32,7 @@ const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         next(error);
     }
 });
-exports.getBlogs = getBlogs;
-const ask = (req, res) => {
+export const ask = (req, res) => {
     console.log("RECEIVED BODY ===>", req.body);
     const { name, email, message } = req.body;
     const mailOptions = {
@@ -52,8 +51,8 @@ const ask = (req, res) => {
     });
     res.status(200).json({ message: "Message received" });
 };
-exports.ask = ask;
-const subscribe = (req, res, next) => {
+
+export const subscribe = (req, res, next) => {
     console.log("REQ>BODY ====>", req.body);
     const { email } = req.body;
     if (!email || email.trim() === "") {
@@ -80,4 +79,3 @@ const subscribe = (req, res, next) => {
         }
     });
 };
-exports.subscribe = subscribe;

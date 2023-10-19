@@ -37,4 +37,4 @@ app.use((error, req, res, next) => {
         errorMessage = error.message;
     res.status(statusCode).json({ error: errorMessage });
 });
-exports.default = app;
+export default app;

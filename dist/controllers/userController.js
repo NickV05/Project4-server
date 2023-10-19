@@ -4,7 +4,7 @@ exports.verify = exports.login = exports.createUser = void 0;
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../server.js";
-const createUser = (req, res, next) => {
+export const createUser = (req, res, next) => {
     const saltRounds = 10;
     const { email, password, fullName, location, username } = req.body;
     console.log("REQ.BODY ===>", req.body);
@@ -93,8 +93,8 @@ const createUser = (req, res, next) => {
         }
     });
 };
-exports.createUser = createUser;
-const login = (req, res, next) => {
+
+export const login = (req, res, next) => {
     const { email, password } = req.body;
     console.log("REQ.BODY ===>", req.body);
     if (email === "" || password === "") {
@@ -141,9 +141,9 @@ const login = (req, res, next) => {
         }
     });
 };
-exports.login = login;
-const verify = (req, res) => {
+
+export const verify = (req, res) => {
     console.log("req.user", req.user);
     res.status(200).json(req.user);
 };
-exports.verify = verify;
+
