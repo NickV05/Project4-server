@@ -8,15 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.subscribe = exports.ask = exports.getBlogs = void 0;
-const axios_1 = __importDefault(require("axios"));
-const nodemailer_1 = __importDefault(require("nodemailer"));
-const server_1 = require("../server");
-const transporter = nodemailer_1.default.createTransport({
+import axios from "axios";
+import nodemailer from "nodemailer";
+import { pool } from "../server";
+const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: "nikita.valovyy@gmail.com",
@@ -26,7 +23,7 @@ const transporter = nodemailer_1.default.createTransport({
 const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const umbrellaUrl = "https://expressapp.adaptable.app/forum/getblogs";
-        const response = yield axios_1.default.get(umbrellaUrl);
+        const response = yield axios.get(umbrellaUrl);
         const data = response.data;
         console.log("Response ===>", data);
         res.json(data);
@@ -63,7 +60,7 @@ const subscribe = (req, res, next) => {
         res.status(400).json({ message: "Please provide a valid email address." });
         return;
     }
-    server_1.pool.getConnection((err, connection) => {
+    pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error connecting to MySQL: ', err);
             next(err);

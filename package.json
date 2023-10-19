@@ -2,9 +2,10 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node ./src/server.ts",
+    "start": "node ./dist/server.js",
     "dev": "nodemon ./src/server.ts",
     "lint": "eslint . --ext .ts"
   },

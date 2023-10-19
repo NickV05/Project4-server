@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verify = exports.login = exports.createUser = void 0;
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const server_1 = require("../server");
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { pool } from "../server";
 const createUser = (req, res, next) => {
     const saltRounds = 10;
     const { email, password, fullName, location, username } = req.body;
@@ -27,7 +24,7 @@ const createUser = (req, res, next) => {
         });
         return;
     }
-    server_1.pool.getConnection((err, connection) => {
+    pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error connecting to MySQL: ', err);
             next(err);
@@ -56,8 +53,8 @@ const createUser = (req, res, next) => {
                                 });
                             }
                             else {
-                                const salt = bcryptjs_1.default.genSaltSync(saltRounds);
-                                const hashedPassword = bcryptjs_1.default.hashSync(password, salt);
+                                const salt = bcrypt.genSaltSync(saltRounds);
+                                const hashedPassword = bcrypt.hashSync(password, salt);
                                 connection.query('INSERT INTO users (email, password, fullName, location, username, image) VALUES (?, ?, ?, ?, ?, ?)', [email, hashedPassword, fullName, location, username, "https://res.cloudinary.com/dyto7dlgt/image/upload/v1691526692/project3/avatar_h1b0st.jpg"], (insertErr, results) => {
                                     if (insertErr) {
                                         console.error('Error executing INSERT query: ', insertErr);
@@ -78,7 +75,7 @@ const createUser = (req, res, next) => {
                                             else {
                                                 const userId = results.insertId;
                                                 const payload = { email, _id: userId, fullName, location, username, image: "https://res.cloudinary.com/dyto7dlgt/image/upload/v1691526692/project3/avatar_h1b0st.jpg" };
-                                                const authToken = jsonwebtoken_1.default.sign(payload, process.env.SECRET, {
+                                                const authToken = jwt.sign(payload, process.env.SECRET, {
                                                     algorithm: "HS256",
                                                     expiresIn: "6h",
                                                 });
@@ -104,7 +101,7 @@ const login = (req, res, next) => {
         res.status(400).json({ message: "Provide email and password." });
         return;
     }
-    server_1.pool.getConnection((err, connection) => {
+    pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error connecting to MySQL: ', err);
             next(err);
@@ -123,11 +120,11 @@ const login = (req, res, next) => {
                     }
                     else {
                         const foundUser = results[0];
-                        const passwordCorrect = bcryptjs_1.default.compareSync(password, foundUser.password);
+                        const passwordCorrect = bcrypt.compareSync(password, foundUser.password);
                         if (passwordCorrect) {
                             const { email, id, fullName, location, username, image } = foundUser;
                             const payload = { email, _id: id, fullName, location, username, image };
-                            const authToken = jsonwebtoken_1.default.sign(payload, process.env.SECRET, {
+                            const authToken = jwt.sign(payload, process.env.SECRET, {
                                 algorithm: "HS256",
                                 expiresIn: "6h",
                             });
