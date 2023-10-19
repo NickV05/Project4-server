@@ -57,7 +57,7 @@ function onListening() {
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }
-const pool = mysql.createPool({
+export const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
@@ -70,7 +70,6 @@ const pool = mysql.createPool({
         ca: fs.readFileSync('public/ca.pem'),
     }
 });
-exports.pool = pool;
 pool.getConnection((err, connection) => {
     if (err) {
         console.error('Error connecting to MySQL: ', err);
