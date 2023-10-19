@@ -1,13 +1,15 @@
-import { Request, Response, NextFunction } from "express";
-import jwt, {JwtPayload } from "jsonwebtoken";
+const express = require("express");
+const { Request, Response, NextFunction } = express;
+const jwt = require("jsonwebtoken");
+const { JwtPayload } = jwt;
 
 declare module "express" {
   interface Request {
-    user?: JwtPayload;
+    user?: typeof JwtPayload;
   }
 }
 
-const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+const isAuthenticated = async (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token || token === "null") {
@@ -15,7 +17,7 @@ const isAuthenticated = async (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    const tokenInfo = jwt.verify(token, process.env.SECRET as string) as JwtPayload;
+    const tokenInfo = jwt.verify(token, process.env.SECRET as string) as typeof JwtPayload ;
     req.user = tokenInfo;
     next();
   } catch (error:any ) {

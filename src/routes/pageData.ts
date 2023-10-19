@@ -1,6 +1,5 @@
-import * as pageDataController from "../controllers/pageDataController";
-import  express  from "express";
-// import isAuthenticated from "../middleware/isAuthenticated";
+const pageDataController = require("../controllers/pageDataController");
+const express = require("express");
 const router = express.Router();
 
 router.get("/blogs", pageDataController.getBlogs);

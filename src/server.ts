@@ -1,8 +1,9 @@
-import * as mysql from "mysql2"
-import app from './app'
-import * as fs from 'fs';
+const mysql = require("mysql2");
+const app = require('./app');
+const fs = require('fs');
 const debug = require('debug')('server:server');
 const http = require('http');
+const {PoolConnection } = require('mysql2');
 
 const port = normalizePort(process.env.PORT);
 app.set('port', port);
@@ -79,7 +80,7 @@ const pool = mysql.createPool({
   }
 });
 
-pool.getConnection((err: any | null, connection: mysql.PoolConnection) => {
+pool.getConnection((err: any | null, connection: typeof PoolConnection) => {
   if (err) {
     console.error('Error connecting to MySQL: ', err);
   } else {

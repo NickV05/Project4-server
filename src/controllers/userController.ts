@@ -1,11 +1,10 @@
-import { RequestHandler } from "express";
-import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { pool } from "../server"
+const { RequestHandler, Request, Response, NextFunction } = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { pool } = require("../server");
+const { MysqlError, PoolConnection} = require("mysql2");
 
-
-export const createUser: RequestHandler = (req, res, next) => {
+export const createUser: typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
   const saltRounds = 10;
   const { email, password, fullName, location, username } = req.body;
   console.log("REQ.BODY ===>", req.body)
@@ -29,12 +28,12 @@ export const createUser: RequestHandler = (req, res, next) => {
     return;
   }
 
-  pool.getConnection((err, connection) => {
+  pool.getConnection((err:typeof MysqlError, connection:typeof PoolConnection) => {
     if (err) {
       console.error('Error connecting to MySQL: ', err);
       next(err);
     } else {
-      connection.beginTransaction((beginTransactionErr) => {
+      connection.beginTransaction((beginTransactionErr:typeof MysqlError) => {
         if (beginTransactionErr) {
           console.error('Error beginning transaction: ', beginTransactionErr);
           connection.release();
@@ -43,7 +42,7 @@ export const createUser: RequestHandler = (req, res, next) => {
           connection.query(
             'SELECT * FROM users WHERE email = ?',
             [email],
-            (selectErr, results:any) => {
+            (selectErr:typeof MysqlError, results:any) => {
               if (selectErr) {
                 console.error('Error executing SELECT query: ', selectErr);
                 connection.rollback(() => {
@@ -63,7 +62,7 @@ export const createUser: RequestHandler = (req, res, next) => {
                   connection.query(
                     'INSERT INTO users (email, password, fullName, location, username, image) VALUES (?, ?, ?, ?, ?, ?)',
                     [email, hashedPassword, fullName, location, username, "https://res.cloudinary.com/dyto7dlgt/image/upload/v1691526692/project3/avatar_h1b0st.jpg"],
-                    (insertErr, results:any) => {
+                    (insertErr:typeof MysqlError, results:any) => {
                       if (insertErr) {
                         console.error('Error executing INSERT query: ', insertErr);
                         connection.rollback(() => {
@@ -71,7 +70,7 @@ export const createUser: RequestHandler = (req, res, next) => {
                           next(insertErr);
                         });
                       } else {
-                        connection.commit((commitErr) => {
+                        connection.commit((commitErr:typeof MysqlError) => {
                           if (commitErr) {
                             console.error('Error committing transaction: ', commitErr);
                             connection.rollback(() => {
@@ -103,8 +102,7 @@ export const createUser: RequestHandler = (req, res, next) => {
   });
 };
 
-
-export const login: RequestHandler = (req, res, next) => {
+export const login: typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
   const { email, password } = req.body;
   console.log("REQ.BODY ===>", req.body)
 
@@ -113,7 +111,7 @@ export const login: RequestHandler = (req, res, next) => {
     return;
   }
 
-  pool.getConnection((err, connection) => {
+  pool.getConnection((err:typeof MysqlError, connection:typeof PoolConnection) => {
     if (err) {
       console.error('Error connecting to MySQL: ', err);
       next(err);
@@ -121,7 +119,7 @@ export const login: RequestHandler = (req, res, next) => {
       connection.query(
         'SELECT * FROM users WHERE email = ?',
         [email],
-        (selectErr, results:any) => {
+        (selectErr:typeof MysqlError, results:any) => {
           if (selectErr) {
             console.error('Error executing SELECT query: ', selectErr);
             connection.release();
@@ -155,7 +153,7 @@ export const login: RequestHandler = (req, res, next) => {
   });
 };
 
- export const verify = (req:Request, res:Response) => {
+ export const verify = (req:typeof Request, res:typeof Response) => {
 
     console.log("req.user", req.user);
   

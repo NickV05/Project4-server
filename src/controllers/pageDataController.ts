@@ -1,7 +1,7 @@
-import { RequestHandler } from "express";
-import axios from "axios";
-import nodemailer from "nodemailer";
-import { pool } from "../server"
+const { RequestHandler, Request, Response, NextFunction } = require("express");
+const axios = require("axios");
+const nodemailer = require("nodemailer");
+const { pool } = require("../server");
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export const getBlogs: RequestHandler = async (req, res, next) => {
+export const getBlogs: typeof RequestHandler = async (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
   try {
     const umbrellaUrl = "https://expressapp.adaptable.app/forum/getblogs"; 
     const response = await axios.get(umbrellaUrl);
@@ -23,7 +23,7 @@ export const getBlogs: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const ask: RequestHandler = (req, res) => {
+export const ask: typeof RequestHandler = (req:typeof Request, res:typeof Response) => {
   console.log("RECEIVED BODY ===>", req.body);
   const { name, email, message } = req.body;
 
@@ -34,7 +34,7 @@ export const ask: RequestHandler = (req, res) => {
     text: `From ${name}, ${email}. ${message}`
  };
  
- transporter.sendMail(mailOptions, function(error, info){
+ transporter.sendMail(mailOptions, function(error:any, info:any){
     if(error){
        console.log(error);
     }else{
@@ -45,14 +45,14 @@ export const ask: RequestHandler = (req, res) => {
   res.status(200).json({ message: "Message received" });
 };
 
-export const subscribe: RequestHandler = (req, res, next) => {
+export const subscribe:typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
   console.log("REQ>BODY ====>", req.body);
   const { email } = req.body;
   if (!email || email.trim() === "") {
     res.status(400).json({ message: "Please provide a valid email address." });
     return;
   }
-  pool.getConnection((err, connection) => {
+  pool.getConnection((err:any, connection:any) => {
     if (err) {
       console.error('Error connecting to MySQL: ', err);
       next(err);
@@ -60,7 +60,7 @@ export const subscribe: RequestHandler = (req, res, next) => {
       connection.query(
         'INSERT INTO emails (email) VALUES (?)',
         [email],
-        (insertErr) => {
+        (insertErr:any) => {
           connection.release();
 
           if (insertErr) {

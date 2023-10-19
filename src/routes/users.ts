@@ -1,6 +1,6 @@
-import * as usersController from "../controllers/userController";
-import  express  from "express";
-import isAuthenticated from "../middleware/isAuthenticated";
+const usersController = require("../controllers/userController");
+const express = require("express");
+const isAuthenticated = require("../middleware/isAuthenticated");
 const router = express.Router();
 
 router.post("/signup", usersController.createUser);
