@@ -1,5 +1,6 @@
-const app = require("./app");
-const mongoose = require('mongoose')
+import * as mysql from "mysql2"
+import app from './app'
+import * as fs from 'fs';
 const debug = require('debug')('server:server');
 const http = require('http');
 
@@ -63,12 +64,29 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then((x: { connections: { name: any; }[]; }) => {
-    console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);
-  })
-  .catch((err: any) => {
-    console.error("Error connecting to mongo: ", err);
-  });
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user:  process.env.DB_USER,
+  password:  process.env.DB_PASS,
+  database:  process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  port: 13137,
+  ssl: {
+    ca: fs.readFileSync('public/ca.pem'),  
+  }
+});
+
+pool.getConnection((err: any | null, connection: mysql.PoolConnection) => {
+  if (err) {
+    console.error('Error connecting to MySQL: ', err);
+  } else {
+    console.log('Connected to MySQL database');
+    connection.release();
+  }
+});
+
+export { pool }
 

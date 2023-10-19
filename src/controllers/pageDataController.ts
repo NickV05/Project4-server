@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import axios from "axios";
 import nodemailer from "nodemailer";
-import Email from "../models/Email";
+import { pool } from "../server"
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -46,16 +46,34 @@ export const ask: RequestHandler = (req, res) => {
 };
 
 export const subscribe: RequestHandler = (req, res, next) => {
-  console.log("REQ>BODY ====>", req.body)
+  console.log("REQ>BODY ====>", req.body);
   const { email } = req.body;
-  Email.create({ email })
-    .then((createdEmail) => {
-      console.log("SUBSCRIBED EMAIL ===>", createdEmail);
-    })
-    .catch((error: Error) => {
-      console.log(error);
-      next(error);
-    });
+  if (!email || email.trim() === "") {
+    res.status(400).json({ message: "Please provide a valid email address." });
+    return;
+  }
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error connecting to MySQL: ', err);
+      next(err);
+    } else {
+      connection.query(
+        'INSERT INTO emails (email) VALUES (?)',
+        [email],
+        (insertErr) => {
+          connection.release();
+
+          if (insertErr) {
+            console.error('Error inserting email into the database: ', insertErr);
+            next(insertErr);
+          } else {
+            console.log("SUBSCRIBED EMAIL ===>", email);
+            res.status(200).json({ message: "Email subscription successful." });
+          }
+        }
+      );
+    }
+  });
 };
 
 

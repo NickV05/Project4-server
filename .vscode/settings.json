@@ -1,0 +1,21 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Enabled",
+                "ssl": {
+                    "ca": "C:\\Users\\Win10Pro\\Desktop\\Personal\\Projects\\My project 4\\Project4-server\\server\\public\\ca.pem"
+                }
+            },
+            "previewLimit": 50,
+            "server": "hospitaldb-hospital.a.aivencloud.com",
+            "port": 13137,
+            "driver": "MySQL",
+            "name": "Cloud Connection",
+            "database": "hospitaldb",
+            "username": "avnadmin",
+            "password": "AVNS_EaEVUFiFtTeWAdUcQ79"
+        }
+    ]
+}

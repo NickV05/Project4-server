@@ -5,7 +5,6 @@ import createHttpError, { isHttpError} from "http-errors";
 require('dotenv').config()
 const express = require('express');
 const app = express();
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors')
@@ -23,10 +22,6 @@ app.use(
       origin: [process.env.CLIENT_URI]  
     })
   );
-
-app.get("/", (req:Request, res:Response,) => {
-    res.send("Hello world!!");
-  })
 
   app.use('/users', usersRouter);
   app.use('/pageData', pageRouter);
