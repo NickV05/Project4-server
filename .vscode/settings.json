@@ -5,7 +5,7 @@
                 "authProtocol": "default",
                 "enableSsl": "Enabled",
                 "ssl": {
-                    "ca": "C:\\Users\\Win10Pro\\Desktop\\Personal\\Projects\\My project 4\\Project4-server\\server\\public\\ca.pem"
+                    "ca": "../public/ca.pem"
                 }
             },
             "previewLimit": 50,
