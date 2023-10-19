@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.verify = exports.login = exports.createUser = void 0;
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../server.js";
