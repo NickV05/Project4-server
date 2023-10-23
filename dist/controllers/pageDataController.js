@@ -30,6 +30,50 @@ export const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         next(error);
     }
 });
+
+export const getTimeSlots = async (req, res, next) => {
+    const { date } = req.body;
+    console.log("REQ.BODY ===>", req.body);
+    const year = date.slice(0, 4);
+    const month = date.slice(5, 7);
+    const day = date.slice(8, 10);
+    console.log("YEAR ===>", year);
+    console.log("MONTH ===>", month);
+    console.log("DAY ===>", day);
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.error('Error connecting to MySQL: ', err);
+        next(err);
+      } else {
+        connection.beginTransaction((beginTransactionErr) => {
+          if (beginTransactionErr) {
+            console.error('Error beginning transaction: ', beginTransactionErr);
+            connection.release();
+            next(beginTransactionErr);
+          } else {
+            console.log("TRANSACTION STARTED")
+            connection.query('SELECT * FROM appoints WHERE year = ? AND month = ? AND date = ?', [year, month, day], (selectErr, results) => {
+              if (selectErr) {
+                console.error('Error executing SELECT query: ', selectErr);
+                connection.release();
+                next(selectErr);
+              } else {
+                if (results.length === 0) {
+                  res.status(200).json({ message: "No appointments found for this date" });
+                  connection.release();
+                } else {
+                  console.log("RESULTS ===>", results);
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  };
+
 export const ask = (req, res) => {
     console.log("RECEIVED BODY ===>", req.body);
     const { name, email, message } = req.body;

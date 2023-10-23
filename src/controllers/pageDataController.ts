@@ -2,6 +2,7 @@ const { RequestHandler, Request, Response, NextFunction } = require("express");
 const axios = require("axios");
 const nodemailer = require("nodemailer");
 const { pool } = require("../server");
+const { MysqlError, PoolConnection} = require("mysql2");
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -22,6 +23,48 @@ export const getBlogs: typeof RequestHandler = async (req:typeof Request, res:ty
     next(error);
   }
 };
+
+export const getTimeSlots: typeof RequestHandler = async (req: typeof Request, res: typeof Response, next: typeof NextFunction) => {
+  const { date } = req.body;
+  console.log("REQ.BODY ===>", req.body);
+  const year = date.slice(0, 4);
+  const month = date.slice(5, 7);
+  const day = date.slice(8, 10);
+
+  console.log("YEAR ===>", year);
+  console.log("MONTH ===>", month);
+  console.log("DAY ===>", day);
+
+  pool.getConnection((err: typeof MysqlError, connection: typeof PoolConnection) => {
+    if (err) {
+      console.error('Error connecting to MySQL: ', err);
+      next(err);
+    } else {
+      connection.query(
+        'SELECT * FROM appoints WHERE year = ? AND month = ? AND day = ?',
+        [year, month, day],
+        (selectErr: typeof MysqlError, results: any) => {
+          if (selectErr) {
+            console.error('Error executing SELECT query: ', selectErr);
+            connection.release();
+            next(selectErr);
+          } else {
+            if (results.length === 0) {
+              res.status(401).json({ message: "No appointments found for this date" });
+              connection.release();
+            } else {
+              console.log("RESULTS ===>", results);
+              res.status(200).json(results);
+              connection.release();
+            }
+          }
+        }
+      );
+    }
+  });
+};
+
+
 
 export const ask: typeof RequestHandler = (req:typeof Request, res:typeof Response) => {
   console.log("RECEIVED BODY ===>", req.body);
