@@ -32,8 +32,64 @@ export const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
 });
 
 export const getTimeSlots = async (req, res, next) => {
-    const { date } = req.body;
+    const { date, doctorName } = req.body;
     console.log("REQ.BODY ===>", req.body);
+    const year = date.slice(0, 4);
+    const month = date.slice(5, 7);
+    const day = date.slice(8, 10);
+    console.log("YEAR ===>", year);
+    console.log("MONTH ===>", month);
+    console.log("DAY ===>", day);
+    const timeValues = [
+      "10:00",
+      "11:00",
+      "12:00",
+      "13:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00",
+      "18:00",
+    ];
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.error('Error connecting to MySQL: ', err);
+        next(err);
+      } else {
+        connection.beginTransaction((beginTransactionErr) => {
+          if (beginTransactionErr) {
+            console.error('Error beginning transaction: ', beginTransactionErr);
+            connection.release();
+            next(beginTransactionErr);
+          } else {
+            console.log("TRANSACTION STARTED")
+            connection.query('SELECT * FROM appoints WHERE year = ? AND month = ? AND date = ? AND doctor =?', [year, month, day, doctorName], (selectErr, results) => {
+              if (selectErr) {
+                console.error('Error executing SELECT query: ', selectErr);
+                connection.release();
+                next(selectErr);
+              } else {
+                if (results.length === 0) {
+                  res.status(200).json(timeValues);
+                  connection.release();
+                } else {
+                  console.log("RESULTS ===>", results);
+                  const bookedTimes = results.map(result => result.time);
+                  const availableTimes = timeValues.filter(time => !bookedTimes.includes(time));
+                  res.status(200).json(availableTimes);
+                  connection.release();
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  };
+
+  export const confirm = (req, res) => {
+    console.log("RECEIVED BODY ===>", req.body);
+    const { time, service, doctorName, date, user } = req.body;
     const year = date.slice(0, 4);
     const month = date.slice(5, 7);
     const day = date.slice(8, 10);
@@ -51,28 +107,34 @@ export const getTimeSlots = async (req, res, next) => {
             connection.release();
             next(beginTransactionErr);
           } else {
-            console.log("TRANSACTION STARTED")
-            connection.query('SELECT * FROM appoints WHERE year = ? AND month = ? AND date = ?', [year, month, day], (selectErr, results) => {
-              if (selectErr) {
-                console.error('Error executing SELECT query: ', selectErr);
-                connection.release();
-                next(selectErr);
+            connection.query('INSERT INTO appoints (date, year, month, servicetype, doctor, time, user) VALUES (?, ?, ?, ?, ?, ?, ?)', [day, year, month, service, doctorName, time, user.email], (insertErr, results) => {
+              if (insertErr) {
+                console.error('Error executing INSERT query: ', insertErr);
+                connection.rollback(() => {
+                  connection.release();
+                  next(insertErr);
+                });
               } else {
-                if (results.length === 0) {
-                  res.status(200).json({ message: "No appointments found for this date" });
-                  connection.release();
-                } else {
-                  console.log("RESULTS ===>", results);
-                  res.status(200).json(results);
-                  connection.release();
-                }
+                connection.commit((commitErr) => {
+                  if (commitErr) {
+                    console.error('Error committing transaction: ', commitErr);
+                    connection.rollback(() => {
+                      connection.release();
+                      next(commitErr);
+                    });
+                  } else {
+                    res.status(200).json({ message: "Appointment confirmed" });
+                    connection.release();
+                  }
+                }); 
               }
-            });
+            }); 
           }
-        });
+        }); 
       }
-    });
+    }); 
   };
+
 
 export const ask = (req, res) => {
     console.log("RECEIVED BODY ===>", req.body);

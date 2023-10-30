@@ -6,4 +6,5 @@ router.get("/blogs", pageDataController.getBlogs);
 router.post("/ask", pageDataController.ask);
 router.post("/subscribe", pageDataController.subscribe);
 router.post("/getTime", pageDataController.getTimeSlots);
+router.post("/confirm", pageDataController.confirm);
 export default router;
