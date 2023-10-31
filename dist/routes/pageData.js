@@ -7,4 +7,8 @@ router.post("/ask", pageDataController.ask);
 router.post("/subscribe", pageDataController.subscribe);
 router.post("/getTime", pageDataController.getTimeSlots);
 router.post("/confirm", pageDataController.confirm);
+router.get("/getAppointments/:id", pageDataController.getAppointments);
+router.get("/getAppoint/:id", pageDataController.getAppoint);
+router.post("/reschedule", pageDataController.reschedule);
+router.get("/cancel/:id", pageDataController.cancel);
 export default router;
