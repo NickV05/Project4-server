@@ -49,7 +49,6 @@ export const getTimeSlots = async (req, res, next) => {
       "15:00",
       "16:00",
       "17:00",
-      "18:00",
     ];
     pool.getConnection((err, connection) => {
       if (err) {
