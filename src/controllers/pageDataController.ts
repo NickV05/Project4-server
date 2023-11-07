@@ -43,7 +43,7 @@ export const getTimeSlots: typeof RequestHandler = async (req: typeof Request, r
       connection.query(
         'SELECT * FROM appoints WHERE year = ? AND month = ? AND day = ?',
         [year, month, day],
-        (selectErr: typeof MysqlError, results: any) => {
+        (selectErr: typeof MysqlError, results: Array<object>) => {
           if (selectErr) {
             console.error('Error executing SELECT query: ', selectErr);
             connection.release();
@@ -95,7 +95,7 @@ export const subscribe:typeof RequestHandler = (req:typeof Request, res:typeof R
     res.status(400).json({ message: "Please provide a valid email address." });
     return;
   }
-  pool.getConnection((err:any, connection:any) => {
+  pool.getConnection((err: typeof MysqlError, connection: typeof PoolConnection) => {
     if (err) {
       console.error('Error connecting to MySQL: ', err);
       next(err);
@@ -103,7 +103,7 @@ export const subscribe:typeof RequestHandler = (req:typeof Request, res:typeof R
       connection.query(
         'INSERT INTO emails (email) VALUES (?)',
         [email],
-        (insertErr:any) => {
+        (insertErr:typeof MysqlError) => {
           connection.release();
 
           if (insertErr) {
@@ -115,6 +115,244 @@ export const subscribe:typeof RequestHandler = (req:typeof Request, res:typeof R
           }
         }
       );
+    }
+  });
+};
+
+export const confirm:typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
+  console.log("RECEIVED BODY ===>", req.body);
+  const { time, service, doctorName, date, user } = req.body;
+  const year = date.slice(0, 4);
+  const month = date.slice(5, 7);
+  const day = date.slice(8, 10);
+  pool.getConnection((err: typeof MysqlError, connection: typeof PoolConnection) => {
+    if (err) {
+      console.error("Error connecting to MySQL: ", err);
+      next(err);
+    } else {
+      connection.beginTransaction((beginTransactionErr: typeof MysqlError) => {
+        if (beginTransactionErr) {
+          console.error("Error beginning transaction: ", beginTransactionErr);
+          connection.release();
+          next(beginTransactionErr);
+        } else {
+          connection.query(
+            "INSERT INTO appoints (date, year, month, servicetype, doctor, time, user) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [day, year, month, service, doctorName, time, user.email],
+            (insertErr: typeof MysqlError, results:Array<object>) => {
+              if (insertErr) {
+                console.error("Error executing INSERT query: ", insertErr);
+                connection.rollback(() => {
+                  connection.release();
+                  next(insertErr);
+                });
+              } else {
+                connection.commit((commitErr: typeof MysqlError) => {
+                  if (commitErr) {
+                    console.error("Error committing transaction: ", commitErr);
+                    connection.rollback(() => {
+                      connection.release();
+                      next(commitErr);
+                    });
+                  } else {
+                    res.status(200).json({ message: "Appointment confirmed" });
+                    connection.release();
+                  }
+                });
+              }
+            }
+          );
+        }
+      });
+    }
+  });
+};
+
+export const reschedule:typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
+  console.log("RECEIVED BODY ===>", req.body);
+  const { time, service, doctorName, date, user } = req.body;
+  const year = date.slice(0, 4);
+  const month = date.slice(5, 7);
+  const day = date.slice(8, 10);
+  pool.getConnection((err: typeof MysqlError, connection: typeof PoolConnection) => {
+    if (err) {
+      console.error("Error connecting to MySQL: ", err);
+      next(err);
+    } else {
+      connection.beginTransaction((beginTransactionErr: typeof MysqlError) => {
+        if (beginTransactionErr) {
+          console.error("Error beginning transaction: ", beginTransactionErr);
+          connection.release();
+          next(beginTransactionErr);
+        } else {
+          connection.query(
+            "UPDATE appoints SET date = ?, servicetype = ?, time = ?, year = ?, month = ? WHERE doctor = ? AND user = ?",
+            [day, service, time, year, month, doctorName, user.email],
+            (updateErr: typeof MysqlError, results:Array<object>) => {
+              if (updateErr) {
+                console.error("Error executing UPDATE query: ", updateErr);
+                connection.rollback(() => {
+                  connection.release();
+                  next(updateErr);
+                });
+              } else {
+                connection.commit((commitErr: typeof MysqlError) => {
+                  if (commitErr) {
+                    console.error("Error committing transaction: ", commitErr);
+                    connection.rollback(() => {
+                      connection.release();
+                      next(commitErr);
+                    });
+                  } else {
+                    res.status(200).json({ message: "Appointment changed" });
+                    connection.release();
+                  }
+                });
+              }
+            }
+          );
+        }
+      });
+    }
+  });
+};
+
+export const cancel:typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
+  const { id } = req.params;
+
+  pool.getConnection((err: typeof MysqlError, connection: typeof PoolConnection) => {
+    if (err) {
+      console.error("Error connecting to MySQL: ", err);
+      next(err);
+    } else {
+      connection.beginTransaction((beginTransactionErr: typeof MysqlError) => {
+        if (beginTransactionErr) {
+          console.error("Error beginning transaction: ", beginTransactionErr);
+          connection.release();
+          next(beginTransactionErr);
+        } else {
+          console.log("TRANSACTION STARTED");
+          const query = "DELETE FROM appoints WHERE id = ?";
+          connection.query(query, [id], (deleteErr: typeof MysqlError, results:Array<object>) => {
+            if (deleteErr) {
+              console.error("Error executing SELECT query: ", deleteErr);
+              connection.release();
+              next(deleteErr);
+            } else {
+              console.log("Appointment cancelled");
+              res.status(200).json({ message: "Appointment cancelled" });
+              connection.release();
+            }
+          });
+        }
+      });
+    }
+  });
+};
+
+export const getAppointments:typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
+  const { id } = req.params;
+  pool.getConnection((err:typeof MysqlError, connection:typeof PoolConnection) => {
+    if (err) {
+      console.error("Error connecting to MySQL: ", err);
+      next(err);
+    } else {
+      connection.beginTransaction((beginTransactionErr:typeof MysqlError) => {
+        if (beginTransactionErr) {
+          console.error("Error beginning transaction: ", beginTransactionErr);
+          connection.release();
+          next(beginTransactionErr);
+        } else {
+          console.log("TRANSACTION STARTED");
+          connection.query(
+            "SELECT * FROM users WHERE id = ? ",
+            [id],
+            (selectErr:typeof MysqlError, results:any) => {
+              if (selectErr) {
+                console.error("Error executing SELECT query: ", selectErr);
+                connection.release();
+                next(selectErr);
+              } else {
+                if (results.length === 0) {
+                  res.status(401).json({ message: "No user found" });
+                  console.log("NO USER FOUND");
+                  connection.release();
+                } else {
+                  console.log("RESULTS ===>", results);
+                  connection.query(
+                    "SELECT * FROM appoints WHERE user = ? ",
+                    [results[0].email],
+                    (selectErr:typeof MysqlError, appointResults:Array<object>) => {
+                      if (selectErr) {
+                        console.error(
+                          "Error executing SELECT query: ",
+                          selectErr
+                        );
+                        connection.release();
+                        next(selectErr);
+                      } else {
+                        if (appointResults.length === 0) {
+                          res.status(200).json([]);
+                          console.log("NO APPOINTS FOUND");
+                          connection.release();
+                        } else {
+                          console.log(
+                            "APPOINTMENT RESULTS ===>",
+                            appointResults
+                          );
+                          res.status(200).json(appointResults);
+                          connection.release();
+                        }
+                      }
+                    }
+                  );
+                }
+              }
+            }
+          );
+        }
+      });
+    }
+  });
+};
+
+export const getAppoint:typeof RequestHandler = (req:typeof Request, res:typeof Response, next:typeof NextFunction) => {
+  const { id } = req.params;
+
+  pool.getConnection((err:typeof MysqlError, connection:typeof PoolConnection) => {
+    if (err) {
+      console.error("Error connecting to MySQL: ", err);
+      next(err);
+    } else {
+      connection.beginTransaction((beginTransactionErr:typeof MysqlError) => {
+        if (beginTransactionErr) {
+          console.error("Error beginning transaction: ", beginTransactionErr);
+          connection.release();
+          next(beginTransactionErr);
+        } else {
+          console.log("TRANSACTION STARTED");
+          connection.query(
+            "SELECT * FROM appoints WHERE id = ? ",
+            [id],
+            (selectErr:typeof MysqlError, results:Array<object>) => {
+              if (selectErr) {
+                console.error("Error executing SELECT query: ", selectErr);
+                connection.release();
+                next(selectErr);
+              } else {
+                if (results.length === 0) {
+                  res.status(401).json({ message: "No appoints found" });
+                  connection.release();
+                } else {
+                  console.log("RESULTS ===>", results);
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              }
+            }
+          );
+        }
+      });
     }
   });
 };
